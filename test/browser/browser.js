@@ -3697,7 +3697,7 @@
 	      }
 
 	      // valid surrogate pair
-	      codePoint = leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00 | 0x10000
+	      codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000
 	    } else if (leadSurrogate) {
 	      // valid bmp char, but last char was a lead
 	      if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD)
@@ -4001,38 +4001,10 @@
 /* 8 */
 /***/ function(module, exports) {
 
-	
-	/**
-	 * isArray
-	 */
+	var toString = {}.toString;
 
-	var isArray = Array.isArray;
-
-	/**
-	 * toString
-	 */
-
-	var str = Object.prototype.toString;
-
-	/**
-	 * Whether or not the given `val`
-	 * is an array.
-	 *
-	 * example:
-	 *
-	 *        isArray([]);
-	 *        // > true
-	 *        isArray(arguments);
-	 *        // > false
-	 *        isArray('');
-	 *        // > false
-	 *
-	 * @param {mixed} val
-	 * @return {bool}
-	 */
-
-	module.exports = isArray || function (val) {
-	  return !! val && '[object Array]' == str.call(val);
+	module.exports = Array.isArray || function (arr) {
+	  return toString.call(arr) == '[object Array]';
 	};
 
 
@@ -8234,6 +8206,26 @@
 	    };
 
 	    return this.getFayeClient().subscribe('/' + this.notificationChannel, callback);
+	  },
+
+	  unsubscribe: function() {
+	    /**
+	     * Unsubscribes from any changes in the feed
+	     * @method unsubscribe
+	     * @memberof StreamFeed.prototype
+	     * @example
+	     * feed.unsubscribe(callback);
+	     */
+	    if (!this.client.appId) {
+	      throw new errors.SiteError('Missing app id, which is needed to subscribe, use var client = stream.connect(key, secret, appId);');
+	    }
+
+	    this.client.subscriptions['/' + this.notificationChannel] = {
+	      token: this.token,
+	      userId: this.notificationChannel,
+	    };
+
+	    return this.getFayeClient().unsubscribe('/' + this.notificationChannel);
 	  },
 	};
 
