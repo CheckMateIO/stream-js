@@ -273,6 +273,26 @@ StreamFeed.prototype = {
 
     return this.getFayeClient().subscribe('/' + this.notificationChannel, callback);
   },
+
+  unsubscribe: function() {
+    /**
+     * Unsubscribes from any changes in the feed
+     * @method unsubscribe
+     * @memberof StreamFeed.prototype
+     * @example
+     * feed.unsubscribe(callback);
+     */
+    if (!this.client.appId) {
+      throw new errors.SiteError('Missing app id, which is needed to subscribe, use var client = stream.connect(key, secret, appId);');
+    }
+
+    this.client.subscriptions['/' + this.notificationChannel] = {
+      token: this.token,
+      userId: this.notificationChannel,
+    };
+
+    return this.getFayeClient().unsubscribe('/' + this.notificationChannel);
+  },
 };
 
 module.exports = StreamFeed;
