@@ -73,6 +73,6 @@
     "sauce": "node test/saucelabs.js"
   },
   "engines": {
-    "node": ">=0.8 <0.11"
+    "node": ">= 0.12.0"
   }
 }
